@@ -1,0 +1,26 @@
+{
+  "name": "auditsmartcontract",
+  "version": "1.0.0",
+  "description": "Smart contract audit project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.18"
+  },
+  "dependencies": {
+    "eth-gas-reporter": "^0.2.27",
+    "ethereumjs-wallet": "^1.0.2",
+    "ethers": "^6.10.0"
+  },
+  "overrides": {
+    "elliptic": "^6.6.1",
+    "cookie": "^0.7.0",
+    "ws": "^8.17.0"
+  }
+}

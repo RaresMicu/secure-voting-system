@@ -1,0 +1,19 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model SecuredStoringBox {
+  vote_id   String   @id
+  candidate String
+  timestamp DateTime @default(now())
+}
+
+model VoteResults {
+  candidate String @id
+  votes     Int    @default(0)
+}

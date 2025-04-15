@@ -1,5 +1,5 @@
 import * as dotenv from "dotenv";
-const fs = require("fs");
+import * as fs from "fs";
 const Wallet = require("ethereumjs-wallet").default;
 
 dotenv.config();

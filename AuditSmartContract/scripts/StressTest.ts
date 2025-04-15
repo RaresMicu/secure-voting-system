@@ -1,32 +1,39 @@
+import * as dotenv from "dotenv";
 import { ethers } from "hardhat";
 
-// Constante test
-const contractAddress = "0xEb73dd2A9598A1cBE7BCCaF16d41A9cE034ED4Dc";
-const pollingStationId = "B-02-0005";
-const parties = [
-  "Party1",
-  "Party2",
-  "Party3",
-  "Party4",
-  "Party5",
-  "Party6",
-  "Party7",
-  "Party8",
-  "Party9",
-  "Party10",
-  "Party11",
-  "Party12",
-  "Party13",
-  "Party14",
-  "Party15",
-  "Party16",
-  "Party17",
-  "Party18",
-  "Party19",
-  "Party20",
-];
+dotenv.config();
 
 async function main() {
+  // Constante test
+  const contractAddress = process.env.CONTRACT_ADDRESS as string;
+  if (!contractAddress) {
+    throw new Error("Contract address not found in environment variables.");
+  }
+
+  const pollingStationId = "B-02-0005";
+  const parties = [
+    "Party1",
+    "Party2",
+    "Party3",
+    "Party4",
+    "Party5",
+    "Party6",
+    "Party7",
+    "Party8",
+    "Party9",
+    "Party10",
+    "Party11",
+    "Party12",
+    "Party13",
+    "Party14",
+    "Party15",
+    "Party16",
+    "Party17",
+    "Party18",
+    "Party19",
+    "Party20",
+  ];
+
   // Instantiere contract VotingAudit
   const VotingAudit = await ethers.getContractAt(
     "VotingAudit",

@@ -1,7 +1,14 @@
 import { ethers } from "hardhat";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 async function main() {
-  const contractAddress = "0x2A62417a696075Ff88FC7b7B09e8AFA19e6A5598";
+  const contractAddress = process.env.CONTRACT_ADDRESS as string;
+  if (!contractAddress) {
+    throw new Error("Contract address not found in environment variables.");
+  }
+
   const TRANSACTION_HASH =
     "0xeef5ced947dafc723d27f05fe0eb67ecd6c18f590c451162d3293402862d6270";
 

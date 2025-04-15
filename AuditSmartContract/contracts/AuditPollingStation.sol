@@ -44,8 +44,8 @@ contract VotingAudit {
     // Functie pentru actualizarea numarului de voturi a tuturor partidelor la o sectie de votare
     function updateVotes(
         string memory pollingStationId, // ID unic al sectiei de votare
-        string[] memory parties, // Stiva cu numele partidelor
-        uint32[] memory votes // Stiva cu numarul de voturi pentru fiecare partid
+        string[] memory parties, // Array cu numele partidelor
+        uint32[] memory votes // Array cu numarul de voturi pentru fiecare partid
     ) public {
         require(
             parties.length == votes.length,

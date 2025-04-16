@@ -9,7 +9,7 @@ const config: HardhatUserConfig = {
   networks: {
     private: {
       url: process.env.NODE_URL || "", // Al 3-lea nod (stocare)
-      accounts: [`${process.env.NODE_ADRESS}`],
+      accounts: [`${process.env.NODE_ADDRESS}`],
     },
   },
 };

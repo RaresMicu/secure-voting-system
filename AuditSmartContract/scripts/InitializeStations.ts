@@ -42,10 +42,14 @@ async function main() {
   for (const station of stations) {
     // Initializara unei statii de votare
     const tx = await VotingAudit.initializeStation(station, parties);
-    await tx.wait();
     console.log(`Station ${station} initialized.`);
     console.log(`Transaction Hash: ${tx.hash}`);
+    await delay(200);
   }
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 main().catch((error) => {

@@ -8,6 +8,9 @@ import {
 
 export const send_results = async (req: Request, res: Response) => {
   const { station_id } = req.body;
+  if (!station_id) {
+    return res.status(400).json({ error: "Missing station_id." });
+  }
 
   const response = await fetch(
     `http://localhost:3000/pollingmachine/castedvotes`,
@@ -40,10 +43,6 @@ export const send_results = async (req: Request, res: Response) => {
     votes = sanitizeEnvList("VOTES", rawVotes.join(","), 12, {
       type: "number",
     }) as number[];
-
-    if (!station_id) {
-      throw new Error("Missing station_id.");
-    }
 
     sanitizeEnvString("STATION_ID", station_id);
   } catch (err: any) {

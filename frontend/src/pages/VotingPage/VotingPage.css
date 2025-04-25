@@ -1,0 +1,123 @@
+.arrows-candidates-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  background: #24336a;
+  background-image: url("../../assets/backgroundVote.svg");
+  background-size: cover;
+}
+
+.arrow-left {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  width: fit-content;
+  height: 100%;
+  padding-left: 110px;
+  padding-right: 110px;
+  background-color: #ffffff05;
+}
+
+.arrow-right {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  width: fit-content;
+  height: 100%;
+  padding-left: 110px;
+  padding-right: 110px;
+  background-color: #ffffff05;
+}
+
+.voting-page {
+  margin-bottom: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+}
+
+.page-number {
+  display: flex;
+  width: 65px;
+  height: 65px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  color: #fff;
+  font-family: "Reddit Sans";
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.voting-page-text {
+  width: 1132px;
+  height: 84px;
+  color: #fff;
+  text-align: center;
+  font-family: "Reddit Sans";
+  font-size: 40px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 32px;
+}
+
+.voting-page-candidates {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  width: 1531px;
+  gap: 55px 45px;
+}
+
+.voting-page-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  gap: 20px;
+  height: fit-content;
+}
+
+.button {
+  position: relative;
+  top: 120px;
+  display: flex;
+  width: 200px;
+  height: 97px;
+  padding: 10px 20px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 60px;
+  color: #14133b;
+  text-align: center;
+  font-family: "Reddit Sans";
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 80px;
+  cursor: pointer;
+  transition: opacity 0.3s ease, background-color 0.3s ease;
+}
+
+.gobackcolour {
+  background: #d9d9d9;
+}
+
+.castvotecolour {
+  background: #53ff92;
+}
+
+.deactivated-button {
+  opacity: 0.5;
+  background: #d9d9d9;
+  color: #14133b;
+  cursor: not-allowed;
+}

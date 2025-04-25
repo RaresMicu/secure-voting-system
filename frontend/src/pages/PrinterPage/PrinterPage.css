@@ -1,0 +1,10 @@
+.printer-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  background-color: #14133b;
+  background-image: url("../../assets/backgroundauth.svg");
+  background-size: cover;
+}

@@ -33,6 +33,13 @@
   font-weight: 600;
 }
 
+.id-styling {
+  width: 400px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .text-details-container {
   display: flex;
   flex-direction: column;

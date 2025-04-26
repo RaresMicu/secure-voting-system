@@ -1,9 +1,11 @@
+import cors from "cors";
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import voteRouter from "./routes/voteRoutes";
 import blockchainRouter from "./routes/blockchainRoutes";
 
 const app = express();
+app.use(cors());
 const prisma = new PrismaClient();
 
 app.use(express.json());

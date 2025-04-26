@@ -1,13 +1,20 @@
-import React from "react";
-import { useLocation } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./PrinterPage.css";
 import PrintedVoteBox from "../../components/PrintedVoteBox/PrintedVoteBox";
 
 function PrinterPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { vote } = location.state || {};
 
-  const generateRandomId = () => Math.floor(Math.random() * 1000000);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigate("/authentication");
+    }, 7000);
+
+    return () => clearTimeout(timer);
+  }, [navigate]);
 
   return (
     <div className="printer-page">
@@ -16,7 +23,7 @@ function PrinterPage() {
           vote={{
             candidate: vote.name,
             party: vote.party,
-            id: generateRandomId(),
+            id: vote.id,
           }}
         />
       ) : (

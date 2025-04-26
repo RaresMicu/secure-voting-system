@@ -2,24 +2,27 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./VotingPage.css";
 import CandidateBox from "../../components/CandidateBox/CandidateBox";
+import { cast_vote, secure_vote } from "../../services/voteService";
 
 function VotingPage() {
   const [selectedCandidateId, setSelectedCandidateId] = useState(null);
   const [isVoteActive, setIsVoteActive] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // Loading state
   const navigate = useNavigate();
 
   const candidates = [
-    { id: 1, name: "Candidate A", image: "party.png", party: "Party 1" },
-    { id: 2, name: "Candidate B", image: "party.png", party: "Party 2" },
-    { id: 3, name: "Candidate C", image: "party.png", party: "Party 3" },
-    { id: 4, name: "Candidate D", image: "party.png", party: "Party 4" },
-    { id: 5, name: "Candidate E", image: "party.png", party: "Party 5" },
-    { id: 6, name: "Candidate F", image: "party.png", party: "Party 6" },
-    { id: 7, name: "Candidate G", image: "party.png", party: "Party 7" },
-    { id: 8, name: "Candidate H", image: "party.png", party: "Party 8" },
-    { id: 9, name: "Candidate I", image: "party.png", party: "Party 9" },
-    { id: 10, name: "Candidate J", image: "party.png", party: "Party 10" },
-    { id: 11, name: "Candidate K", image: "party.png", party: "Party 11" },
+    { id: 1, name: "Candidate A", image: "party.png", party: "Party1" },
+    { id: 2, name: "Candidate B", image: "party.png", party: "Party2" },
+    { id: 3, name: "Candidate C", image: "party.png", party: "Party3" },
+    { id: 4, name: "Candidate D", image: "party.png", party: "Party4" },
+    { id: 5, name: "Candidate E", image: "party.png", party: "Party5" },
+    { id: 6, name: "Candidate F", image: "party.png", party: "Party6" },
+    { id: 7, name: "Candidate G", image: "party.png", party: "Party7" },
+    { id: 8, name: "Candidate H", image: "party.png", party: "Party8" },
+    { id: 9, name: "Candidate I", image: "party.png", party: "Party9" },
+    { id: 10, name: "Candidate J", image: "party.png", party: "Party10" },
+    { id: 11, name: "Candidate K", image: "party.png", party: "Party11" },
+    { id: 12, name: "Candidate L", image: "party.png", party: "Party12" },
   ];
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -36,13 +39,38 @@ function VotingPage() {
     setIsVoteActive(false);
   };
 
-  const handleCastVote = () => {
+  const handleCastVote = async () => {
     if (isVoteActive && selectedCandidateId) {
-      alert(`You voted for candidate ID: ${selectedCandidateId}`);
       const selectedCandidate = candidates.find(
         (candidate) => candidate.id === selectedCandidateId
       );
-      navigate("/printerproof", { state: { vote: selectedCandidate } });
+
+      try {
+        setIsLoading(true);
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        await cast_vote(selectedCandidate.party);
+
+        const secureResponse = await secure_vote(selectedCandidate.party);
+
+        if (secureResponse && secureResponse.vote_id) {
+          const voteData = {
+            ...selectedCandidate,
+            id: secureResponse.vote_id,
+          };
+
+          navigate("/printerproof", { state: { vote: voteData } });
+        } else {
+          console.error("Invalid secureResponse:", secureResponse);
+        }
+      } catch (error) {
+        console.error(
+          "Error securing vote:",
+          error.response?.data || error.message
+        );
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -66,6 +94,11 @@ function VotingPage() {
 
   return (
     <div className="arrows-candidates-container">
+      {isLoading && (
+        <div className="loading-overlay">
+          <p>Processing your vote...</p>
+        </div>
+      )}
       <div className="arrow-left" onClick={handlePreviousPage}>
         <img src={require("../../assets/leftArrow.svg").default} alt="<" />
       </div>

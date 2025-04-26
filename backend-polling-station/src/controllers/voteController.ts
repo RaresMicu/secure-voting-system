@@ -133,3 +133,32 @@ export const reset_db = async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
+// GET: Functie care primeste in header un hash (simulare a cardului de vot)
+// Daca e la fel ca cel din baza de date, se activeaza statia de votare (200)
+// Daca nu, se returneaza 401 Unauthorized
+export const activate_polling_station = async (req: Request, res: Response) => {
+  const activated_key_hash = req.headers.authorization as string;
+
+  if (!activated_key_hash) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    // Verificarea hash-ului in baza de date
+    const station = await prisma.pollingStationActivation.findFirst({
+      where: {
+        polling_station_hash: activated_key_hash.toString(),
+      },
+    });
+
+    if (!station) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    return res.status(200).json();
+  } catch (error) {
+    console.error("Error activating polling station:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};

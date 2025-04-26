@@ -16,7 +16,7 @@ function PrintedVoteBox({ vote }) {
           <p className="text-details">{vote.party}</p>
         </div>
         <p className="vote-id-text">Vote ID:</p>
-        <p className="text-confirmation">#{vote.id}</p>
+        <p className="text-confirmation id-styling">#{vote.id}</p>
       </div>
     </div>
   );

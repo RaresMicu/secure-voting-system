@@ -2,7 +2,7 @@ import React from "react";
 import "./AuthButton.css";
 import { useState } from "react";
 
-function AuthButton({ iconName }) {
+function AuthButton({ iconName, disabled, currentStep }) {
   const [fillColour, setFillColour] = useState("#6F96D1");
 
   const renderSVG = () => {
@@ -61,9 +61,10 @@ function AuthButton({ iconName }) {
 
   return (
     <div
-      className="auth-button-container"
+      className={`auth-button-container ${disabled ? "disabled" : ""} ${
+        currentStep ? "" : "not-current"
+      }`}
       onMouseDown={() => setFillColour("#24336A")}
-      onMouseUp={() => setFillColour("#6F96D1")}
     >
       {renderSVG()}
     </div>

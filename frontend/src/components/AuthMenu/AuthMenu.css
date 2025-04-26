@@ -49,3 +49,7 @@
   fill: #fff;
   cursor: pointer;
 }
+
+.not-current {
+  pointer-events: none;
+}

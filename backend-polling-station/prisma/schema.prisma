@@ -17,3 +17,8 @@ model VoteResults {
   candidate String @id
   votes     Int    @default(0)
 }
+
+model pollingStationActivation {
+  id                   String @id
+  polling_station_hash String
+}

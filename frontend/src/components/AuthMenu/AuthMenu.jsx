@@ -2,7 +2,12 @@ import React from "react";
 import "./AuthMenu.css";
 import AuthButton from "../AuthButton/AuthButton";
 
-function AuthMenu({ onOptionSelect, onStartVoting }) {
+function AuthMenu({
+  onOptionSelect,
+  onStartVoting,
+  completedSteps,
+  currentStep,
+}) {
   return (
     <div className="auth-menu">
       <div className="circle-div">
@@ -10,9 +15,16 @@ function AuthMenu({ onOptionSelect, onStartVoting }) {
           className="button-container top"
           onClick={() => onOptionSelect("ID")}
         >
-          <AuthButton iconName="ID" />
+          <AuthButton
+            iconName="ID"
+            disabled={completedSteps.includes("ID")}
+            currentStep={currentStep === "ID"}
+          />
         </div>
-        <div className="button-container center" onClick={onStartVoting}>
+        <div
+          className={`button-container center ${currentStep === "Key" ? "" : "not-current"}`}
+          onClick={onStartVoting}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="163"
@@ -33,13 +45,21 @@ function AuthMenu({ onOptionSelect, onStartVoting }) {
           className="button-container left"
           onClick={() => onOptionSelect("Fingerprint")}
         >
-          <AuthButton iconName="Fingerprint" />
+          <AuthButton
+            iconName="Fingerprint"
+            disabled={completedSteps.includes("Fingerprint")}
+            currentStep={currentStep === "Fingerprint"}
+          />
         </div>
         <div
           className="button-container right"
           onClick={() => onOptionSelect("Default")}
         >
-          <AuthButton iconName="default" />
+          <AuthButton
+            iconName="default"
+            disabled={completedSteps.includes("Default")}
+            currentStep={currentStep === "Default"}
+          />
         </div>
       </div>
     </div>

@@ -99,23 +99,25 @@ export const cast_vote = async (req: Request, res: Response) => {
 };
 
 // POST: Functie care initializeaza un candidat in baza de date
-export const initialize_candidate = async (req: Request, res: Response) => {
-  const { candidate } = req.body;
+export const initialize_candidates = async (req: Request, res: Response) => {
+  const { candidates } = req.body;
 
-  if (!candidate) {
-    return res.status(400).json({ error: "Missing required fields" });
+  if (!candidates || !Array.isArray(candidates) || candidates.length === 0) {
+    return res
+      .status(400)
+      .json({ error: "Missing or invalid candidates array" });
   }
 
   try {
-    const new_candidate = await prisma.voteResults.create({
-      data: {
+    const new_candidates = await prisma.voteResults.createMany({
+      data: candidates.map((candidate: string) => ({
         candidate,
-      },
+      })),
     });
 
-    return res.status(201).json(new_candidate);
+    return res.status(201).json(new_candidates);
   } catch (error) {
-    console.error("Error initializing candidate:", error);
+    console.error("Error initializing candidates:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 };

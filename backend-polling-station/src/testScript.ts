@@ -1,5 +1,6 @@
 const station_ids = ["B-02-001", "B-02-002", "B-02-003", "B-02-004"];
 const superior_station_id = "B-02-000";
+// const superior_station_id = "B-02-001"; // test
 const superior_station_id_array = [superior_station_id];
 const parties = [
   "Party1",

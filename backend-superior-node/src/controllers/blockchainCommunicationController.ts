@@ -180,6 +180,7 @@ export const get_results = async (req: Request, res: Response) => {
       continue;
     }
   }
+  // console.log("Tallied votes:", tallied_votes);
 
   //Adaugarea voturilor in DB
   try {

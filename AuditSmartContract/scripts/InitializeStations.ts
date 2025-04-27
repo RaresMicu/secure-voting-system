@@ -11,6 +11,7 @@ async function main() {
   }
 
   const stations = [
+    "B-02-0000",
     "B-02-0001",
     "B-02-0002",
     "B-02-0003",

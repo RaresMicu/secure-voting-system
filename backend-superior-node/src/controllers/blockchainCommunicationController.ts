@@ -81,11 +81,10 @@ export const send_results = async (req: Request, res: Response) => {
 
 export const get_results = async (req: Request, res: Response) => {
   const { station_ids } = req.body;
-  if (!station_ids) {
-    return res.status(400).json({ error: "Missing station_ids." });
-  }
-  if (!Array.isArray(station_ids)) {
-    return res.status(400).json({ error: "station_ids should be an array." });
+  if (!station_ids || !Array.isArray(station_ids)) {
+    return res
+      .status(400)
+      .json({ error: "Missing station_ids or bat format." });
   }
 
   const votesData = await prisma.voteResults.findMany({
@@ -167,7 +166,7 @@ export const get_results = async (req: Request, res: Response) => {
 
       // Extragerea voturilor din stdout
       const votes = JSON.parse(result.stdout);
-      //console.log(`Votes for station ${station_id}:`, votes);
+      // console.log(`Votes for station ${station_id}:`, votes);
       votes.forEach((vote: string, index: number) => {
         tallied_votes[candidates[index]] += parseInt(vote, 10);
       });

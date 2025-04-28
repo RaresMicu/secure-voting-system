@@ -22,7 +22,6 @@ export const schedule_initialization_DB = () => {
     }
 
     // Initializeaza baza de date cu candidati
-
     try {
       const response = await fetch(
         "http://localhost:2999/pollingmachine/initializecandidates",
@@ -60,33 +59,54 @@ export const schedule_initialization_DB = () => {
   });
 };
 
-export const schedule_tallying_and_blockchain_storing = () => {};
-//   const station_id = "B-02-001";
+export const schedule_tallying_and_blockchain_storing = () => {
+  const inferior_station_ids = ["B-02-001", "B-02-002", "B-02-003", "B-02-004"];
+  const station_id_superior = "B-02-000";
 
-//   cron.schedule("0 6-23/2 25 5 *", async () => {
-//     console.log("Running scheduled job: Sending results to blockchain");
+  cron.schedule("59 8-23/2 25 5 *", async () => {
+    console.log(
+      "Running scheduled job: Tallying votes from inferior nodes and storing in blockchain"
+    );
 
-//     // Trimite rezultatele catre blockchain
-//     try {
-//       const response = await fetch(
-//         "http://localhost:3000/blockchain/sendresults",
-//         {
-//           method: "POST",
-//           headers: {
-//             "Content-Type": "application/json",
-//           },
-//           body: JSON.stringify({
-//             station_id: station_id,
-//           }),
-//         }
-//       );
-//       if (!response.ok) {
-//         throw new Error(`HTTP error! status: ${response.status}`);
-//       }
-//       const data = await response.json();
-//       console.log("Results sent to blockchain:", data);
-//     } catch (error) {
-//       console.error("Error sending results to blockchain:", error);
-//     }
-//   });
-// };
+    try {
+      const response_getresults = await fetch(
+        "http://localhost:2999/blockchain/getresults",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            station_ids: inferior_station_ids,
+          }),
+        }
+      );
+      if (!response_getresults.ok) {
+        throw new Error(`HTTP error! status: ${response_getresults.status}`);
+      }
+      const data = await response_getresults.json();
+      console.log("Votes tallied and stored in blockchain:", data);
+
+      // Trimitere rezultate catre blockchain
+      const response_sendresults = await fetch(
+        "http://localhost:2999/blockchain/sendresults",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            station_id: station_id_superior,
+          }),
+        }
+      );
+      if (!response_sendresults.ok) {
+        throw new Error(`HTTP error! status: ${response_sendresults.status}`);
+      }
+      const data_sendresults = await response_sendresults.json();
+      console.log("Results sent to blockchain:", data_sendresults);
+    } catch (error) {
+      console.error("Error tallying votes and storing in blockchain:", error);
+    }
+  });
+};

@@ -1,0 +1,22 @@
+[2025-05-24 20:23:06] Task: Update Votes Station | Status: Started
+[2025-05-24 20:23:07] Task: Smart Contract | Status: Failed | Response: {"message":"Error executing script: HH108: Cannot connect to the network private.\nPlease make sure your node is running, and check your internet connection and networks config"}
+[2025-05-24 20:24:05] Task: Update Votes Station | Status: Started
+[2025-05-24 20:24:05] Task: Smart Contract | Status: Failed | Response: {"message":"Error executing script: HH108: Cannot connect to the network private.\nPlease make sure your node is running, and check your internet connection and networks config"}
+[2025-05-24 20:25:05] Task: Update Votes Station | Status: Started
+[2025-05-24 20:25:05] Task: Smart Contract | Status: Failed | Response: {"message":"Error executing script: HH108: Cannot connect to the network private.\nPlease make sure your node is running, and check your internet connection and networks config"}
+[2025-05-24 20:26:05] Task: Update Votes Station | Status: Started
+[2025-05-24 20:26:05] Task: Smart Contract | Status: Failed | Response: {"message":"Error executing script: HH108: Cannot connect to the network private.\nPlease make sure your node is running, and check your internet connection and networks config"}
+[2025-05-24 20:27:05] Task: Update Votes Station | Status: Started
+[2025-05-24 20:27:05] Task: Smart Contract | Status: Failed | Response: {"message":"Error executing script: HH108: Cannot connect to the network private.\nPlease make sure your node is running, and check your internet connection and networks config"}
+[2025-05-24 20:28:05] Task: Update Votes Station | Status: Started
+[2025-05-24 20:28:05] Task: Smart Contract | Status: Failed | Response: {"message":"Error executing script: HH108: Cannot connect to the network private.\nPlease make sure your node is running, and check your internet connection and networks config"}
+[2025-05-24 20:29:04] Task: Update Votes Station | Status: Started
+[2025-05-24 20:29:04] Task: Smart Contract | Status: Failed | Response: {"message":"Error executing script: HH108: Cannot connect to the network private.\nPlease make sure your node is running, and check your internet connection and networks config"}
+[2025-05-24 20:30:05] Task: Update Votes Station | Status: Started
+[2025-05-24 20:30:05] Task: Smart Contract | Status: Failed | Response: {"message":"Error executing script: HH108: Cannot connect to the network private.\nPlease make sure your node is running, and check your internet connection and networks config"}
+[2025-05-24 20:31:04] Task: Update Votes Station | Status: Started
+[2025-05-24 20:31:05] Task: Smart Contract | Status: Failed | Response: {"message":"Error executing script: HH108: Cannot connect to the network private.\nPlease make sure your node is running, and check your internet connection and networks config"}
+[2025-05-24 20:32:05] Task: Update Votes Station | Status: Started
+[2025-05-24 20:32:12] Task: Update Votes Station | Status: Success | Response: {"transactionHash":"0x7649bf4938f4973d13452af096cd2f1c6790610ee7e1c7ace2b775e3d7550597","message":"Votes updated successfully for station B-02-001."}
+[2025-05-24 20:33:04] Task: Update Votes Station | Status: Started
+[2025-05-24 20:33:11] Task: Update Votes Station | Status: Success | Response: {"transactionHash":"0x061e6617823e91c0cf7bbcf6074e946e21d96103639b6ad374985b6d5c81d1f4","message":"Votes updated successfully for station B-02-001."}

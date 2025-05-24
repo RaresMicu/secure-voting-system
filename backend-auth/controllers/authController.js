@@ -1,8 +1,9 @@
-import * as faceapi from "face-api.js";
-import canvas from "canvas";
-import path from "path";
 import fs from "fs";
+import path from "path";
+import canvas from "canvas";
 import { fileURLToPath } from "url";
+import * as faceapi from "face-api.js";
+import { logTask } from "../utilities/logger.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,9 +34,16 @@ export const matchFaces = async (req, res) => {
   try {
     const { reference } = req.files;
     const { queryId } = req.body;
+    logTask("matchFaces", {
+      reference: reference[0].path,
+      queryId: queryId,
+    });
     console.log("QueryID: ", queryId);
 
     if (!queryId) {
+      logTask("matchFaces", {
+        error: "Query ID is required",
+      });
       return res.status(400).json({ error: "Query ID is required" });
     }
 
@@ -44,6 +52,9 @@ export const matchFaces = async (req, res) => {
     console.log("Path: ", queryPath);
 
     if (!fs.existsSync(queryPath)) {
+      logTask("matchFaces", {
+        error: `No image found for ID: ${queryId}`,
+      });
       return res
         .status(404)
         .json({ error: `No image found for ID: ${queryId}` });
@@ -64,9 +75,12 @@ export const matchFaces = async (req, res) => {
     // Clean up temp files
     fs.unlinkSync(refPath);
     console.log(result.toString());
-
+    logTask("matchFaces", result.toString());
     return res.json({ match: result.toString(), distance: result.distance });
   } catch (error) {
+    logTask("matchFaces", {
+      error: error.message,
+    });
     console.error(error);
     return res.status(400).json({ error: error.message });
   }

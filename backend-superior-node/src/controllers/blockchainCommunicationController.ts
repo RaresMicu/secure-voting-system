@@ -2,14 +2,20 @@ import path from "path";
 import { prisma } from "../app";
 import { exec } from "child_process";
 import { Request, Response } from "express";
+
+import { logTask } from "../utilities/logger";
 import {
   sanitizeEnvString,
   sanitizeEnvList,
 } from "../../../shared-utils/sanitize";
+import { count, log } from "console";
 
 export const send_results = async (req: Request, res: Response) => {
+  logTask("Send Results", "Started", { station_id: req.body.station_id });
+
   const { station_id } = req.body;
   if (!station_id) {
+    logTask("Send Results", "Failed", { error: "Missing station_id." });
     return res.status(400).json({ error: "Missing station_id." });
   }
 
@@ -20,6 +26,8 @@ export const send_results = async (req: Request, res: Response) => {
     },
   });
   if (!votesData) {
+    logTask("Send Results", "Failed", { error: "No votes data found." });
+
     return res.status(404).json({ error: "No votes data found." });
   }
 
@@ -41,6 +49,7 @@ export const send_results = async (req: Request, res: Response) => {
 
     sanitizeEnvString("STATION_ID", station_id);
   } catch (err: any) {
+    logTask("Send Results", "Sanitization Failed", { error: err.message });
     return res
       .status(400)
       .json({ error: `Sanitization failed: ${err.message}` });
@@ -66,11 +75,13 @@ export const send_results = async (req: Request, res: Response) => {
     { cwd: path.resolve(__dirname, "../../../AuditSmartContract"), env },
     (error, stdout, stderr) => {
       if (error) {
-        console.error(`Error executing script: ${error.message}`);
-        console.error(`stderr: ${stderr}`);
+        logTask("Send Results", "Script Execution Failed", {
+          error: error.message,
+          stderr,
+        });
         return res.status(500).json({ error: "Script execution failed." });
       }
-
+      logTask("Send Results", "Success", { output: stdout });
       res
         .status(200)
         .json({ message: "Script executed successfully.", output: stdout });
@@ -80,11 +91,16 @@ export const send_results = async (req: Request, res: Response) => {
 ///////////////////////////////////////////////////////
 
 export const get_results = async (req: Request, res: Response) => {
+  logTask("Get Results", "Started", { station_ids: req.body.station_ids });
+
   const { station_ids } = req.body;
   if (!station_ids || !Array.isArray(station_ids)) {
+    logTask("Get Results", "Failed", {
+      error: "Missing station_ids or bad format.",
+    });
     return res
       .status(400)
-      .json({ error: "Missing station_ids or bat format." });
+      .json({ error: "Missing station_ids or bad format." });
   }
 
   const votesData = await prisma.voteResults.findMany({
@@ -93,6 +109,7 @@ export const get_results = async (req: Request, res: Response) => {
     },
   });
   if (!votesData) {
+    logTask("Get Results", "Failed", { error: "No candidates found." });
     return res.status(404).json({ error: "No candidates found." });
   }
 
@@ -119,6 +136,7 @@ export const get_results = async (req: Request, res: Response) => {
       tallied_votes[candidate] = 0;
     });
   } catch (err: any) {
+    logTask("Get Results", "Sanitization Failed", { error: err.message });
     return res
       .status(400)
       .json({ error: `Sanitization failed: ${err.message}` });
@@ -130,6 +148,7 @@ export const get_results = async (req: Request, res: Response) => {
   );
   const command = `npx hardhat run  ${scriptPath} --network private `;
 
+  let countFailedStations: number = 0;
   // Luarea datelor din blockchain pentru fiecare station_id si insumarea voturilor
   for (const station_id of station_ids_sanitized) {
     const env = {
@@ -150,14 +169,17 @@ export const get_results = async (req: Request, res: Response) => {
             },
             (error, stdout, stderr) => {
               if (error) {
-                console.error(
-                  `Error executing script for station ${station_id}: ${error.message}`
-                );
-                console.error(`stderr: ${stderr}`);
+                logTask("Get Results", "Script Execution Failed", {
+                  error: error.message,
+                  stderr,
+                });
                 return reject(
                   new Error(`Failed to fetch votes for station ${station_id}`)
                 );
               }
+              logTask("Get Results", "Script Execution Success", {
+                output: stdout,
+              });
               resolve({ stdout, stderr });
             }
           );
@@ -173,32 +195,66 @@ export const get_results = async (req: Request, res: Response) => {
         tallied_votes[candidates[index]] += parseInt(vote, 10);
       });
     } catch (err) {
+      logTask("Get Results", `Error Fetching Votes for ${station_id}`, {
+        station_id,
+        error: err instanceof Error ? err.message : "Unknown error",
+      });
       console.error(
         `Error processing station ${station_id}: ${
           err instanceof Error ? err.message : "Unknown error"
         }`
       );
+      countFailedStations++;
       continue;
     }
   }
-  
+
   console.log("Tallied votes:", tallied_votes);
 
   //Adaugarea voturilor in DB
   try {
     for (const candidate of candidates) {
-      await prisma.voteResults.update({
-        where: {
-          candidate: candidate,
-        },
-        data: {
-          votes: tallied_votes[candidate],
-        },
+      // Fetch current votes from DB
+      const current = await prisma.voteResults.findUnique({
+        where: { candidate },
+        select: { votes: true },
       });
+
+      const newVotes = tallied_votes[candidate];
+      const oldVotes = current?.votes ?? 0;
+
+      if (newVotes > oldVotes) {
+        await prisma.voteResults.update({
+          where: { candidate },
+          data: { votes: newVotes },
+        });
+        logTask("Get Results", "Votes Updated for Candidate", {
+          candidate,
+          oldVotes,
+          newVotes,
+        });
+      } else {
+        logTask(
+          "Get Results",
+          "Votes Not Updated (Not Higher or failed to fetch)",
+          {
+            candidate,
+            oldVotes,
+            newVotes,
+          }
+        );
+      }
     }
+    logTask("Get Results", "Votes Updated in DB", {
+      candidates,
+      tallied_votes,
+    });
     return res.status(200).json({ message: "Votes updated successfully." });
   } catch (error) {
     console.error("Error updating votes:", error);
+    logTask("Get Results", "DB Update Failed", {
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
     return res
       .status(500)
       .json({ error: "Failed to update votes in the database." });

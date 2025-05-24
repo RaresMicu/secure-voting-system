@@ -1,12 +1,16 @@
 import * as dotenv from "dotenv";
 import { ethers } from "hardhat";
+import { logTask } from "../utilities/logger";
 
 dotenv.config();
-// DE ADAUGAT AUDIT, DE MEMORAT TX HASH-URI INTR-UN FISIER SAU DB + operatiile
 
 async function main() {
+  logTask("Initialize Stations", "Started");
   const contract_address = process.env.CONTRACT_ADDRESS as string;
   if (!contract_address) {
+    logTask("Initialize Stations", "Failed", {
+      message: "Contract address not found in environment variables.",
+    });
     throw new Error("Contract address not found in environment variables.");
   }
 
@@ -43,6 +47,10 @@ async function main() {
   for (const station of stations) {
     // Initializara unei statii de votare
     const tx = await VotingAudit.initializeStation(station, parties);
+    logTask("Initialize Station", "Completed", {
+      station,
+      parties,
+    });
     console.log(`Station ${station} initialized.`);
     console.log(`Transaction Hash: ${tx.hash}`);
     await delay(200);
@@ -54,6 +62,9 @@ function delay(ms: number) {
 }
 
 main().catch((error) => {
+  logTask("Initialize Stations", "Failed", {
+    message: error.message,
+  });
   console.error(error);
   process.exitCode = 1;
 });

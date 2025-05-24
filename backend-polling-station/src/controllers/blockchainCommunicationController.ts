@@ -27,6 +27,7 @@ export const send_results = async (req: Request, res: Response) => {
   }
 
   const votesData = await response.json();
+  console.log("Votes data:", votesData);
 
   let candidates: string[];
   let votes: number[];

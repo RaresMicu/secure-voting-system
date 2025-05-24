@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./AuthPage.css";
 import AuthMenu from "../../components/AuthMenu/AuthMenu.jsx";
 import { auth_session } from "../../services/authService.js";
@@ -10,6 +10,7 @@ function AuthPage({ setIsAuthenticated }) {
   const [completedSteps, setCompletedSteps] = useState([]);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const stepMapping = {
     "Step 1": "ID",
@@ -17,6 +18,23 @@ function AuthPage({ setIsAuthenticated }) {
     "Step 3": "Default",
     "Step 4": "Key",
   };
+  const descriptionMapping = {
+    "Step 1": "ID authentication",
+    "Step 2": "Fingerprint authentication",
+    "Step 3": "Face authentication",
+    "Step 4": "Activate key",
+  };
+
+  useEffect(() => {
+    if (location.state?.activatedStep) {
+      setSelectedStep(location.state.activatedStep);
+      setStepDescription(descriptionMapping[location.state.activatedStep]);
+      setCompletedSteps(location.state.completedSteps || []);
+    } else {
+      setSelectedStep("Step 1");
+      setCompletedSteps([]);
+    }
+  }, [location.state]);
 
   const handleStartVoting = async () => {
     const activated_key_hash = "0x1234567890abcdef";
@@ -49,8 +67,7 @@ function AuthPage({ setIsAuthenticated }) {
         setSelectedStep("Step 3");
         break;
       case "Default":
-        setStepDescription("Activate key");
-        setSelectedStep("Step 4");
+        navigate("/faceauth", { state: { completedSteps } });
         break;
       default:
         setStepDescription("ID authentication");

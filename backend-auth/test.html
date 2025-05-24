@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Face Matcher Upload</title>
+  </head>
+  <body>
+    <h2>Face Matcher: Upload Images</h2>
+    <form id="faceForm" enctype="multipart/form-data">
+      <label for="reference">Reference Image:</label><br />
+      <input
+        type="file"
+        name="reference"
+        accept="image/*"
+        required
+      /><br /><br />
+
+      <label for="query">Query Image:</label><br />
+      <input type="file" name="query" accept="image/*" required /><br /><br />
+
+      <button type="submit">Compare Faces</button>
+    </form>
+
+    <h3>Result:</h3>
+    <pre id="resultOutput"></pre>
+
+    <script>
+      const form = document.getElementById("faceForm");
+      const resultOutput = document.getElementById("resultOutput");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+
+        try {
+          const res = await fetch("http://localhost:3020/auth/facematch", {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await res.json();
+          resultOutput.textContent = JSON.stringify(data, null, 2);
+        } catch (err) {
+          resultOutput.textContent = "Error: " + err.message;
+        }
+      });
+    </script>
+  </body>
+</html>

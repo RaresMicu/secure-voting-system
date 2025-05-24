@@ -7,4 +7,8 @@ const api = axios.create({
   },
 });
 
-export default api;
+const api_auth = axios.create({
+  baseURL: "http://localhost:3020/auth",
+});
+
+export { api, api_auth };

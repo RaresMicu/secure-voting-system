@@ -166,7 +166,9 @@ export const get_results = async (req: Request, res: Response) => {
 
       // Extragerea voturilor din stdout
       const votes = JSON.parse(result.stdout);
-      // console.log(`Votes for station ${station_id}:`, votes);
+
+      console.log(`Votes for station ${station_id}:`, votes);
+
       votes.forEach((vote: string, index: number) => {
         tallied_votes[candidates[index]] += parseInt(vote, 10);
       });
@@ -179,7 +181,8 @@ export const get_results = async (req: Request, res: Response) => {
       continue;
     }
   }
-  // console.log("Tallied votes:", tallied_votes);
+  
+  console.log("Tallied votes:", tallied_votes);
 
   //Adaugarea voturilor in DB
   try {

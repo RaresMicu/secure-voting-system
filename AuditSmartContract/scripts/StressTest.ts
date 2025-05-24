@@ -10,7 +10,7 @@ async function main() {
     throw new Error("Contract address not found in environment variables.");
   }
 
-  const pollingStationId = "B-02-0005";
+  const pollingStationId = "B-02-test";
   const parties = [
     "Party1",
     "Party2",
@@ -44,7 +44,7 @@ async function main() {
   await initializePollingStation(VotingAudit, pollingStationId, parties);
 
   // Run stress test (200 vote updates)
-  await stressTest(VotingAudit, pollingStationId, parties, 200);
+  await stressTest(VotingAudit, pollingStationId, parties, 500);
 
   // Afisarea voturilor pentru statia de votare "pollingStationId"
   await printVotes(VotingAudit, pollingStationId, parties);
@@ -61,7 +61,7 @@ async function initializePollingStation(
   console.log(`Polling station ${stationId} initialized.`);
 }
 
-// Stress test: update votes 200 times
+// Stress test: update votes 500 times
 async function stressTest(
   VotingAudit: any,
   stationId: string,
@@ -75,7 +75,7 @@ async function stressTest(
     console.log(`Transaction ${i + 1}: Votes updated for ${stationId}.`);
 
     // Delay pentru a evita suprapunerea tranzactiilor ==> NonceManagare in viitor
-    await delay(100);
+    await delay(200);
   }
 }
 

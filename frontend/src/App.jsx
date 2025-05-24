@@ -9,6 +9,7 @@ import "./App.css";
 import AuthPage from "./pages/AuthPage/AuthPage.jsx";
 import PrinterPage from "./pages/PrinterPage/PrinterPage.jsx";
 import VotingPage from "./pages/VotingPage/VotingPage.jsx";
+import FaceRecPage from "./pages/FaceRecPage/FaceRecPage.jsx";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -24,6 +25,7 @@ function App() {
           path="/authentication"
           element={<AuthPage setIsAuthenticated={setIsAuthenticated} />}
         />
+        <Route path="/faceauth" element={<FaceRecPage />} />
         <Route
           path="/voting"
           element={

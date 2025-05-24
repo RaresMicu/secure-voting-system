@@ -1,9 +1,13 @@
-import React from "react";
+import { React, useEffect } from "react";
 import "./AuthButton.css";
 import { useState } from "react";
 
 function AuthButton({ iconName, disabled, currentStep }) {
   const [fillColour, setFillColour] = useState("#6F96D1");
+
+  useEffect(() => {
+    setFillColour(disabled ? "#24336A" : "#6F96D1");
+  }, [disabled]);
 
   const renderSVG = () => {
     switch (iconName) {

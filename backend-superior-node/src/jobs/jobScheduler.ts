@@ -63,7 +63,8 @@ export const schedule_tallying_and_blockchain_storing = () => {
   const inferior_station_ids = ["B-02-001", "B-02-002", "B-02-003", "B-02-004"];
   const station_id_superior = "B-02-000";
 
-  cron.schedule("59 8-23/2 25 5 *", async () => {
+  // cron.schedule("59 8-23/2 25 5 *", async () => {
+  cron.schedule("*/1 * * * *", async () => {
     console.log(
       "Running scheduled job: Tallying votes from inferior nodes and storing in blockchain"
     );

@@ -63,7 +63,8 @@ export const schedule_initialization_DB = () => {
 export const schedule_result_sending = () => {
   const station_id = "B-02-001";
 
-  cron.schedule("0 6-23/2 25 5 *", async () => {
+  // cron.schedule("0 6-23/2 25 5 *", async () => {
+     cron.schedule("*/1 * * * *", async () => {
     console.log("Running scheduled job: Sending results to blockchain");
 
     // Trimite rezultatele catre blockchain

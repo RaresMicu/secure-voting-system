@@ -34,10 +34,7 @@ export const matchFaces = async (req, res) => {
   try {
     const { reference } = req.files;
     const { queryId } = req.body;
-    logTask("matchFaces", {
-      reference: reference[0].path,
-      queryId: queryId,
-    });
+    logTask("matchFaces", "Started", queryId);
     console.log("QueryID: ", queryId);
 
     if (!queryId) {

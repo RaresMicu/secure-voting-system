@@ -39,6 +39,15 @@ function AuthPage({ setIsAuthenticated }) {
   const handleStartVoting = async () => {
     const activated_key_hash = "0x1234567890abcdef";
 
+    if (completedSteps.length < 3) {
+      setSelectedStep("Step 1");
+      setStepDescription("ID authentication");
+      setCompletedSteps([]);
+      alert("Please complete all steps before starting voting.");
+      console.error("Not enough steps completed to start voting.");
+      return;
+    }
+
     try {
       const response = await auth_session(activated_key_hash);
 
@@ -59,12 +68,10 @@ function AuthPage({ setIsAuthenticated }) {
 
     switch (option) {
       case "ID":
-        setStepDescription("Fingerprint authentication");
-        setSelectedStep("Step 2");
+        navigate("/idcheck", { state: { completedSteps } });
         break;
       case "Fingerprint":
-        setStepDescription("Face authentication");
-        setSelectedStep("Step 3");
+        navigate("/fingerprintauth", { state: { completedSteps } });
         break;
       case "Default":
         navigate("/faceauth", { state: { completedSteps } });

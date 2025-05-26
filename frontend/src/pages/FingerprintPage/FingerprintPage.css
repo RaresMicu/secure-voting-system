@@ -1,4 +1,4 @@
-.face-auth-container {
+.finger-auth-container {
   height: 100vh;
   width: 100vw;
   color: #fff;
@@ -8,7 +8,7 @@
   font-family: "Reddit Sans", "Roboto", "Helvetica", "Arial", sans-serif;
 }
 
-.face-container {
+.finger-container {
   margin: auto;
   height: 60%;
   display: flex;
@@ -33,7 +33,7 @@ input[type="file"] {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 240px;
+  width: 300px;
   height: 60px;
   padding: 0px 55px;
   color: #14133b;
@@ -50,13 +50,13 @@ input[type="file"] {
   background-color: #b6b3b3;
 }
 
-.face-container button {
+.finger-container button {
   position: absolute;
   margin: auto;
   margin-top: 120px;
   left: 0;
   right: 0;
-  width: 240px;
+  width: 300px;
   height: 60px;
   color: #14133b;
   border-radius: 50px;

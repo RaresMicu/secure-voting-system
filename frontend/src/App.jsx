@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -10,6 +10,8 @@ import AuthPage from "./pages/AuthPage/AuthPage.jsx";
 import PrinterPage from "./pages/PrinterPage/PrinterPage.jsx";
 import VotingPage from "./pages/VotingPage/VotingPage.jsx";
 import FaceRecPage from "./pages/FaceRecPage/FaceRecPage.jsx";
+import FingerprintPage from "./pages/FingerprintPage/FingerprintPage.jsx";
+import IDCheckPage from "./pages/IDCheckPage/IDCheckPage.jsx";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -25,7 +27,9 @@ function App() {
           path="/authentication"
           element={<AuthPage setIsAuthenticated={setIsAuthenticated} />}
         />
+        <Route path="/idcheck" element={<IDCheckPage />} />
         <Route path="/faceauth" element={<FaceRecPage />} />
+        <Route path="/fingerprintauth" element={<FingerprintPage />} />
         <Route
           path="/voting"
           element={

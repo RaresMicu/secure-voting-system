@@ -1,6 +1,11 @@
 node_modules
 .env
-
+nbis
+nbisinst
+minutiae
+backend-auth/assets/
+ backend-auth/logs/
+ backend-auth/uploads/
 # Hardhat files
 /cache
 /artifacts

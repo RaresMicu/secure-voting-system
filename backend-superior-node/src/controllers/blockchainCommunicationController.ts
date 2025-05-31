@@ -1,22 +1,25 @@
 import path from "path";
-import { prisma } from "../app";
 import { exec } from "child_process";
 import { Request, Response } from "express";
-
 import { logTask } from "../utilities/logger";
 import {
   sanitizeEnvString,
   sanitizeEnvList,
 } from "../../../shared-utils/sanitize";
-import { count, log } from "console";
+import { PrismaClient } from "@prisma/client";
 
-export const send_results = async (req: Request, res: Response) => {
+export const send_results = async (
+  req: Request,
+  res: Response,
+  prisma: PrismaClient | any
+) => {
   logTask("Send Results", "Started", { station_id: req.body.station_id });
 
   const { station_id } = req.body;
   if (!station_id) {
     logTask("Send Results", "Failed", { error: "Missing station_id." });
-    return res.status(400).json({ error: "Missing station_id." });
+    res.status(400).json({ error: "Missing station_id." });
+    return;
   }
 
   const votesData = await prisma.voteResults.findMany({
@@ -28,15 +31,16 @@ export const send_results = async (req: Request, res: Response) => {
   if (!votesData) {
     logTask("Send Results", "Failed", { error: "No votes data found." });
 
-    return res.status(404).json({ error: "No votes data found." });
+    res.status(404).json({ error: "No votes data found." });
+    return;
   }
 
   let candidates: string[];
   let votes: number[];
 
   try {
-    const rawCandidates = votesData.map((data) => data.candidate);
-    const rawVotes = votesData.map((data) => data.votes);
+    const rawCandidates = votesData.map((data: any) => data.candidate);
+    const rawVotes = votesData.map((data: any) => data.votes);
 
     candidates = sanitizeEnvList(
       "CANDIDATES",
@@ -50,9 +54,8 @@ export const send_results = async (req: Request, res: Response) => {
     sanitizeEnvString("STATION_ID", station_id);
   } catch (err: any) {
     logTask("Send Results", "Sanitization Failed", { error: err.message });
-    return res
-      .status(400)
-      .json({ error: `Sanitization failed: ${err.message}` });
+    res.status(400).json({ error: `Sanitization failed: ${err.message}` });
+    return;
   }
 
   const scriptPath = path.resolve(
@@ -79,7 +82,8 @@ export const send_results = async (req: Request, res: Response) => {
           error: error.message,
           stderr,
         });
-        return res.status(500).json({ error: "Script execution failed." });
+        res.status(500).json({ error: "Script execution failed." });
+        return;
       }
       logTask("Send Results", "Success", { output: stdout });
       res
@@ -90,7 +94,11 @@ export const send_results = async (req: Request, res: Response) => {
 };
 ///////////////////////////////////////////////////////
 
-export const get_results = async (req: Request, res: Response) => {
+export const get_results = async (
+  req: Request,
+  res: Response,
+  prisma: PrismaClient | any
+) => {
   logTask("Get Results", "Started", { station_ids: req.body.station_ids });
 
   const { station_ids } = req.body;
@@ -98,9 +106,8 @@ export const get_results = async (req: Request, res: Response) => {
     logTask("Get Results", "Failed", {
       error: "Missing station_ids or bad format.",
     });
-    return res
-      .status(400)
-      .json({ error: "Missing station_ids or bad format." });
+    res.status(400).json({ error: "Missing station_ids or bad format." });
+    return;
   }
 
   const votesData = await prisma.voteResults.findMany({
@@ -110,7 +117,8 @@ export const get_results = async (req: Request, res: Response) => {
   });
   if (!votesData) {
     logTask("Get Results", "Failed", { error: "No candidates found." });
-    return res.status(404).json({ error: "No candidates found." });
+    res.status(404).json({ error: "No candidates found." });
+    return;
   }
 
   let candidates: string[];
@@ -118,7 +126,7 @@ export const get_results = async (req: Request, res: Response) => {
   const tallied_votes: { [candidate: string]: number } = {};
 
   try {
-    const rawCandidates = votesData.map((data) => data.candidate);
+    const rawCandidates = votesData.map((data: any) => data.candidate);
     const rawStationIds = station_ids.map((data) => data);
 
     candidates = sanitizeEnvList(
@@ -137,9 +145,8 @@ export const get_results = async (req: Request, res: Response) => {
     });
   } catch (err: any) {
     logTask("Get Results", "Sanitization Failed", { error: err.message });
-    return res
-      .status(400)
-      .json({ error: `Sanitization failed: ${err.message}` });
+    res.status(400).json({ error: `Sanitization failed: ${err.message}` });
+    return;
   }
 
   const scriptPath = path.resolve(
@@ -249,14 +256,14 @@ export const get_results = async (req: Request, res: Response) => {
       candidates,
       tallied_votes,
     });
-    return res.status(200).json({ message: "Votes updated successfully." });
+    res.status(200).json({ message: "Votes updated successfully." });
+    return;
   } catch (error) {
     console.error("Error updating votes:", error);
     logTask("Get Results", "DB Update Failed", {
       error: error instanceof Error ? error.message : "Unknown error",
     });
-    return res
-      .status(500)
-      .json({ error: "Failed to update votes in the database." });
+    res.status(500).json({ error: "Failed to update votes in the database." });
+    return;
   }
 };

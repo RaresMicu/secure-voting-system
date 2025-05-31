@@ -1,6 +1,5 @@
 import { send_results } from "./blockchainCommunicationController";
-import { logTask } from "../utilities/logger";
-import { sanitizeEnvList, sanitizeEnvString } from "../../../shared-utils/sanitize";
+import { sanitizeEnvList } from "../../../shared-utils/sanitize";
 
 jest.mock("../utilities/logger", () => ({
   logTask: jest.fn(),
@@ -45,7 +44,9 @@ describe("send_results", () => {
     fetchSpy.mockResolvedValue({ ok: false, statusText: "Not Found" });
     await send_results(req, res);
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ error: "Failed to fetch votes data." });
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Failed to fetch votes data.",
+    });
   });
 
   it("should return 400 if sanitization fails", async () => {
@@ -58,7 +59,9 @@ describe("send_results", () => {
     });
     await send_results(req, res);
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ error: expect.stringContaining("Sanitization failed") });
+    expect(res.json).toHaveBeenCalledWith({
+      error: expect.stringContaining("Sanitization failed"),
+    });
   });
 
   it("should return 500 if script execution fails", async () => {
@@ -71,7 +74,9 @@ describe("send_results", () => {
     });
     await send_results(req, res);
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ error: "Script execution failed." });
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Script execution failed.",
+    });
   });
 
   it("should return 200 if script executes successfully", async () => {

@@ -26,3 +26,4 @@ backend-auth/uploads/
 ignition/deployments/chain-31337
 
 /backend-polling-station/coverage
+/backend-superior-node/coverage

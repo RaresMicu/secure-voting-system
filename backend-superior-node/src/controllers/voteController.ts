@@ -1,10 +1,13 @@
-import crypto from "crypto";
-import { prisma } from "../app";
 import { Request, Response } from "express";
 import { logTask } from "../utilities/logger";
+import { PrismaClient } from "@prisma/client";
 
 // POST: Functie care initializeaza un candidat in baza de date
-export const initialize_candidates = async (req: Request, res: Response) => {
+export const initialize_candidates = async (
+  req: Request,
+  res: Response,
+  prisma: PrismaClient | any
+) => {
   logTask("initialize_candidates", "Initializing candidates in the database", {
     candidates: req.body.candidates,
   });
@@ -14,9 +17,8 @@ export const initialize_candidates = async (req: Request, res: Response) => {
     logTask("initialize_candidates", "Failed to initialize candidates", {
       error: "Missing or invalid candidates array",
     });
-    return res
-      .status(400)
-      .json({ error: "Missing or invalid candidates array" });
+    res.status(400).json({ error: "Missing or invalid candidates array" });
+    return;
   }
 
   try {
@@ -26,39 +28,54 @@ export const initialize_candidates = async (req: Request, res: Response) => {
       })),
     });
 
-    logTask("initialize_candidates", "Candidates initialized successfully", {
-      count: new_candidates.count,
-    });
-    return res.status(201).json(new_candidates);
+    if (new_candidates) {
+      logTask("initialize_candidates", "Candidates initialized successfully", {
+        count: new_candidates.count,
+      });
+    }
+
+    res.status(201).json(new_candidates);
+    return;
   } catch (error) {
     logTask("initialize_candidates", "Error initializing candidates", {
       error: error instanceof Error ? error.message : "Unknown error",
     });
     console.error("Error initializing candidates:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
+    return;
   }
 };
 
 // DELETE: Functie care reseteaza baza de date (parte de DEV)
-export const reset_db = async (req: Request, res: Response) => {
+export const reset_db = async (
+  req: Request,
+  res: Response,
+  prisma: PrismaClient | any
+) => {
   try {
     // Stergerea tuturor voturilor din baza de date
     logTask("reset_db", "Resetting the database");
     await prisma.voteResults.deleteMany({});
 
     logTask("reset_db", "Database reset successfully");
-    return res.status(200).json({ message: "Database reset successfully" });
+    res.status(200).json({ message: "Database reset successfully" });
+    return;
   } catch (error) {
     logTask("reset_db", "Error resetting database", {
       error: error instanceof Error ? error.message : "Unknown error",
     });
     console.error("Error resetting database:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
+    return;
   }
 };
 
 // GET: Functie care returneaza toate voturile inregistrate
-export const get_all_votes = async (req: Request, res: Response) => {
+export const get_all_votes = async (
+  req: Request,
+  res: Response,
+  prisma: PrismaClient | any
+) => {
   try {
     // Preluarea tuturor voturilor din baza de date
     logTask("get_all_votes", "Fetching all votes from the database");
@@ -69,15 +86,20 @@ export const get_all_votes = async (req: Request, res: Response) => {
       },
     });
 
-    logTask("get_all_votes", "Votes fetched successfully", {
-      count: votes.length,
-    });
-    return res.status(200).json(votes);
+    if (votes) {
+      logTask("get_all_votes", "Votes fetched successfully", {
+        count: votes.length,
+      });
+    }
+
+    res.status(200).json(votes);
+    return;
   } catch (error) {
     logTask("get_all_votes", "Error fetching votes", {
       error: error instanceof Error ? error.message : "Unknown error",
     });
     console.error("Error fetching votes:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
+    return;
   }
 };

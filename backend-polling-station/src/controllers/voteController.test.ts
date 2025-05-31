@@ -1,64 +1,46 @@
+import express from "express";
+import voteRoutes from "../routes/voteRoutes";
+import { logTask } from "../utilities/logger";
+import request from "supertest";
+
 // Mock logger
 jest.mock("../utilities/logger", () => ({
   logTask: jest.fn(),
 }));
 
-// Mock Prisma
-jest.mock("../app", () => {
-  const actual = jest.requireActual("../app");
-  return {
-    ...actual,
-    prisma: {
+describe("voteRoutes", () => {
+  let app: express.Express;
+  let mockPrisma: any;
+
+  beforeEach(() => {
+    mockPrisma = {
       securedStoringBox: {
-        findMany: jest
-          .fn()
-          .mockResolvedValue([
-            { candidate: "Alice", vote_id: "abc123", timestamp: new Date() },
-          ]),
-        create: jest.fn().mockResolvedValue({
-          vote_id: "hash",
-          candidate: "A",
-        }),
-        deleteMany: jest.fn().mockResolvedValue({}),
+        findMany: jest.fn(),
+        create: jest.fn(),
+        deleteMany: jest.fn(),
       },
       voteResults: {
-        findMany: jest.fn().mockResolvedValue([{ candidate: "A", votes: 1 }]),
-        update: jest.fn().mockResolvedValue({ candidate: "A", votes: 2 }),
-        createMany: jest.fn().mockResolvedValue({ count: 2 }),
-        deleteMany: jest.fn().mockResolvedValue({}),
+        findMany: jest.fn(),
+        update: jest.fn(),
+        createMany: jest.fn(),
+        deleteMany: jest.fn(),
       },
       pollingStationActivation: {
-        findFirst: jest.fn((args) => {
-          if (args.where.polling_station_hash === "hash") {
-            return { polling_station_hash: "hash" };
-          }
-          return null;
-        }),
+        findFirst: jest.fn(),
       },
-    },
-  };
-});
-
-import request from "supertest";
-import { app, prisma } from "../app";
-
-describe("Vote Controller", () => {
-  afterEach(() => {
+    };
+    app = express();
+    app.use(express.json());
+    app.use("/pollingmachine", voteRoutes(mockPrisma));
     jest.clearAllMocks();
   });
 
   describe("GET /pollingmachine/auditvotes", () => {
     it("should return all secured votes", async () => {
-      (prisma.securedStoringBox.findMany as jest.Mock).mockResolvedValue([
-        {
-          candidate: "Alice",
-          vote_id: "abc123",
-          timestamp: new Date(),
-        },
+      mockPrisma.securedStoringBox.findMany.mockResolvedValue([
+        { candidate: "Alice", vote_id: "abc123", timestamp: new Date() },
       ]);
       const res = await request(app).get("/pollingmachine/auditvotes");
-      console.log("Response body:", res.body);
-
       expect(res.status).toBe(200);
       expect(res.body[0]).toEqual(
         expect.objectContaining({
@@ -68,11 +50,20 @@ describe("Vote Controller", () => {
         })
       );
     });
+
+    it("should return 500 if findMany throws", async () => {
+      mockPrisma.securedStoringBox.findMany.mockRejectedValueOnce(
+        new Error("fail")
+      );
+      const res = await request(app).get("/pollingmachine/auditvotes");
+      expect(res.status).toBe(500);
+      expect(res.body).toEqual({ error: "Internal server error" });
+    });
   });
 
   describe("POST /pollingmachine/securevote", () => {
     it("should secure a vote", async () => {
-      (prisma.securedStoringBox.create as jest.Mock).mockResolvedValue({
+      mockPrisma.securedStoringBox.create.mockResolvedValue({
         vote_id: "hash",
         candidate: "A",
       });
@@ -89,22 +80,40 @@ describe("Vote Controller", () => {
         .send({});
       expect(res.status).toBe(400);
     });
+
+    it("should return 500 if create throws", async () => {
+      mockPrisma.securedStoringBox.create.mockRejectedValueOnce(
+        new Error("fail")
+      );
+      const res = await request(app)
+        .post("/pollingmachine/securevote")
+        .send({ candidate: "A" });
+      expect(res.status).toBe(500);
+      expect(res.body).toEqual({ error: "Internal server error" });
+    });
   });
 
   describe("GET /pollingmachine/castedvotes", () => {
     it("should return all votes", async () => {
-      (prisma.voteResults.findMany as jest.Mock).mockResolvedValue([
+      mockPrisma.voteResults.findMany.mockResolvedValue([
         { candidate: "A", votes: 1 },
       ]);
       const res = await request(app).get("/pollingmachine/castedvotes");
       expect(res.status).toBe(200);
       expect(res.body).toEqual([{ candidate: "A", votes: 1 }]);
     });
+
+    it("should return 500 if findMany throws", async () => {
+      mockPrisma.voteResults.findMany.mockRejectedValueOnce(new Error("fail"));
+      const res = await request(app).get("/pollingmachine/castedvotes");
+      expect(res.status).toBe(500);
+      expect(res.body).toEqual({ error: "Internal server error" });
+    });
   });
 
   describe("PATCH /pollingmachine/castedvotes", () => {
     it("should cast a vote", async () => {
-      (prisma.voteResults.update as jest.Mock).mockResolvedValue({
+      mockPrisma.voteResults.update.mockResolvedValue({
         candidate: "A",
         votes: 2,
       });
@@ -121,13 +130,20 @@ describe("Vote Controller", () => {
         .send({});
       expect(res.status).toBe(400);
     });
+
+    it("should return 500 if update throws", async () => {
+      mockPrisma.voteResults.update.mockRejectedValueOnce(new Error("fail"));
+      const res = await request(app)
+        .patch("/pollingmachine/castedvotes")
+        .send({ candidate: "A" });
+      expect(res.status).toBe(500);
+      expect(res.body).toEqual({ error: "Internal server error" });
+    });
   });
 
   describe("POST /pollingmachine/initializecandidates", () => {
     it("should initialize candidates", async () => {
-      (prisma.voteResults.createMany as jest.Mock).mockResolvedValue({
-        count: 2,
-      });
+      mockPrisma.voteResults.createMany.mockResolvedValue({ count: 2 });
       const res = await request(app)
         .post("/pollingmachine/initializecandidates")
         .send({ candidates: ["A", "B"] });
@@ -141,23 +157,40 @@ describe("Vote Controller", () => {
         .send({});
       expect(res.status).toBe(400);
     });
+
+    it("should return 500 if createMany throws", async () => {
+      mockPrisma.voteResults.createMany.mockRejectedValueOnce(
+        new Error("fail")
+      );
+      const res = await request(app)
+        .post("/pollingmachine/initializecandidates")
+        .send({ candidates: ["A", "B"] });
+      expect(res.status).toBe(500);
+      expect(res.body).toEqual({ error: "Internal server error" });
+    });
   });
 
   describe("DELETE /pollingmachine/resetdb", () => {
     it("should reset the database", async () => {
-      (prisma.voteResults.deleteMany as jest.Mock).mockResolvedValue({});
-      (prisma.securedStoringBox.deleteMany as jest.Mock).mockResolvedValue({});
+      mockPrisma.voteResults.deleteMany.mockResolvedValue({});
+      mockPrisma.securedStoringBox.deleteMany.mockResolvedValue({});
       const res = await request(app).delete("/pollingmachine/resetdb");
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty("message");
+    });
+    it("should return 500 if voteResults.deleteMany throws", async () => {
+      mockPrisma.voteResults.deleteMany.mockRejectedValueOnce(
+        new Error("fail")
+      );
+      const res = await request(app).delete("/pollingmachine/resetdb");
+      expect(res.status).toBe(500);
+      expect(res.body).toEqual({ error: "Internal server error" });
     });
   });
 
   describe("GET /pollingmachine/activatepollingstation", () => {
     it("should activate polling station", async () => {
-      (
-        prisma.pollingStationActivation.findFirst as jest.Mock
-      ).mockResolvedValue({
+      mockPrisma.pollingStationActivation.findFirst.mockResolvedValue({
         polling_station_hash: "hash",
       });
       const res = await request(app)
@@ -174,13 +207,21 @@ describe("Vote Controller", () => {
     });
 
     it("should return 401 if station not found", async () => {
-      (
-        prisma.pollingStationActivation.findFirst as jest.Mock
-      ).mockResolvedValue(null);
+      mockPrisma.pollingStationActivation.findFirst.mockResolvedValue(null);
       const res = await request(app)
         .get("/pollingmachine/activatepollingstation")
         .set("Authorization", "invalid");
       expect(res.status).toBe(401);
     });
+  });
+  it("should return 500 if findFirst throws", async () => {
+    mockPrisma.pollingStationActivation.findFirst.mockRejectedValueOnce(
+      new Error("fail")
+    );
+    const res = await request(app)
+      .get("/pollingmachine/activatepollingstation")
+      .set("Authorization", "hash");
+    expect(res.status).toBe(500);
+    expect(res.body).toEqual({ error: "Internal server error" });
   });
 });

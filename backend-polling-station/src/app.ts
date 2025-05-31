@@ -13,8 +13,8 @@ app.use(cors());
 const prisma = new PrismaClient();
 
 app.use(express.json());
-app.use("/pollingmachine", voteRouter);
-app.use("/blockchain", blockchainRouter);
+app.use("/pollingmachine", voteRouter(prisma));
+app.use("/blockchain");
 
 if (process.env.NODE_ENV !== "test") {
   schedule_initialization_DB();

@@ -1,10 +1,15 @@
 import crypto from "crypto";
-import { prisma } from "../app";
+// import { prisma } from "../app";
 import { Request, Response } from "express";
 import { logTask } from "../utilities/logger";
+import { PrismaClient } from "@prisma/client";
 
 //GET: Functie care returneaza toate voturile din cutia securizata pentru audit
-export const get_all_secured_votes = async (req: Request, res: Response) => {
+export const get_all_secured_votes = async (
+  req: Request,
+  res: Response,
+  prisma: PrismaClient | any
+) => {
   logTask("Get All Secured Votes", "Started");
   try {
     const secured_votes = await prisma.securedStoringBox.findMany({
@@ -40,7 +45,11 @@ export const get_all_secured_votes = async (req: Request, res: Response) => {
 };
 
 // POST: Functie care simuleaza stocarea votului anonim intr-o cutie de vot securizata
-export const secure_vote = async (req: Request, res: Response) => {
+export const secure_vote = async (
+  req: Request,
+  res: Response,
+  prisma: PrismaClient | any
+) => {
   const { candidate } = req.body;
   logTask("Secure Vote", "Started", {
     candidate,
@@ -98,7 +107,8 @@ export const secure_vote = async (req: Request, res: Response) => {
 // GET: Functie care returneaza toate voturile inregistrate
 export const get_all_votes = async (
   req: Request,
-  res: Response
+  res: Response,
+  prisma: PrismaClient | any
 ): Promise<void> => {
   logTask("Get All Votes", "Started");
   try {
@@ -136,7 +146,11 @@ export const get_all_votes = async (
 };
 
 // PATCH: Functie care simuleaza votarea unui candidat
-export const cast_vote = async (req: Request, res: Response) => {
+export const cast_vote = async (
+  req: Request,
+  res: Response,
+  prisma: PrismaClient | any
+) => {
   const { candidate } = req.body;
   logTask("Cast Vote", "Started", {
     candidate,
@@ -190,7 +204,11 @@ export const cast_vote = async (req: Request, res: Response) => {
 };
 
 // POST: Functie care initializeaza un candidat in baza de date
-export const initialize_candidates = async (req: Request, res: Response) => {
+export const initialize_candidates = async (
+  req: Request,
+  res: Response,
+  prisma: PrismaClient | any
+) => {
   const { candidates } = req.body;
   logTask("Initialize Candidates", "Started", {
     candidates,
@@ -237,7 +255,11 @@ export const initialize_candidates = async (req: Request, res: Response) => {
 };
 
 // DELETE: Functie care reseteaza baza de date (parte de DEV)
-export const reset_db = async (req: Request, res: Response) => {
+export const reset_db = async (
+  req: Request,
+  res: Response,
+  prisma: PrismaClient | any
+) => {
   logTask("Reset Database", "Started");
   try {
     // Stergerea tuturor voturilor din baza de date
@@ -263,7 +285,11 @@ export const reset_db = async (req: Request, res: Response) => {
 // GET: Functie care primeste in header un hash (simulare a cardului de vot)
 // Daca e la fel ca cel din baza de date, se activeaza statia de votare (200)
 // Daca nu, se returneaza 401 Unauthorized
-export const activate_polling_station = async (req: Request, res: Response) => {
+export const activate_polling_station = async (
+  req: Request,
+  res: Response,
+  prisma: PrismaClient | any
+) => {
   const activated_key_hash = req.headers.authorization as string;
   logTask("Activate Polling Station", "Started", {
     activated_key_hash,

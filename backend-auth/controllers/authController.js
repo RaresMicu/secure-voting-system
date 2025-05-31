@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import canvas from "canvas";
 import dotenv from "dotenv";
+import { prisma } from "../app.js";
 import { fileURLToPath } from "url";
 import { exec } from "child_process";
 import * as faceapi from "face-api.js";
@@ -11,6 +12,43 @@ dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Set voter_status as true in the database
+export const setVoterStatus = async (req, res) => {
+  try {
+    const { queryId } = req.body;
+    logTask("setVoterStatus", "Started", queryId);
+    if (!queryId) {
+      logTask("setVoterStatus", "Failed", {
+        error: "Query ID is required",
+      });
+      return res.status(400).json({ error: "Query ID is required" });
+    }
+
+    await prisma.voter_status.update({
+      where: {
+        ID: Number(queryId),
+      },
+      data: {
+        voted: true,
+        timestamp: new Date(),
+        location: "Station-X",
+      },
+    });
+    logTask("setVoterStatus", "Completed", {
+      message: `Voter status updated for ID: ${queryId}`,
+    });
+    return res.json({
+      message: `Voter status updated for ID: ${queryId}`,
+    });
+  } catch (error) {
+    logTask("setVoterStatus", "Error", {
+      error: error.message,
+    });
+    console.error(error);
+    return res.status(400).json({ error: error.message });
+  }
+};
 
 // ID checking in the database
 
@@ -24,6 +62,31 @@ export const checkId = async (req, res) => {
         error: "Query ID is required",
       });
       return res.status(400).json({ error: "Query ID is required" });
+    }
+
+    //Check if the the person already voted
+    const vote_status = await prisma.voter_status.findUnique({
+      where: {
+        ID: Number(queryId),
+      },
+    });
+
+    if (!vote_status) {
+      logTask("checkId", "Authentication failed", {
+        error: `ID not found in the database: ${queryId}`,
+      });
+      return res.status(404).json({
+        error: `ID not found in the database: ${queryId}`,
+      });
+    }
+    if (vote_status.voted) {
+      logTask("checkId", "Authentication failed", {
+        error: `${queryId} has already voted in ${vote_status.location} at ${vote_status.timestamp}`,
+      });
+      return res.json({
+        error: `${queryId} has already voted in ${vote_status.location} at ${vote_status.timestamp}`,
+        info: vote_status,
+      });
     }
 
     const queryDir = path.join(__dirname, "..", "assets", `${queryId}`);

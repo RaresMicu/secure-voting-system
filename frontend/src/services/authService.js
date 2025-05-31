@@ -1,5 +1,16 @@
 import { api, api_auth } from "./api";
 
+// Set voter status
+export const set_voter_status = async (queryId) => {
+  try {
+    const response = await api_auth.put("/setstatusvoter", { queryId });
+    return response.data;
+  } catch (error) {
+    console.error("Error setting voter status:", error);
+    throw error;
+  }
+}
+
 // Key authentication
 export const auth_session = async (activated_key_hash) => {
   try {

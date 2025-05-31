@@ -4,6 +4,7 @@ import {
   matchFaces,
   matchFingerprints,
   checkId,
+  setVoterStatus,
 } from "../controllers/authController.js";
 
 const router = express.Router();
@@ -26,5 +27,6 @@ router.post(
   matchFingerprints
 );
 router.post("/checkid", checkId);
+router.put("/setstatusvoter", setVoterStatus);
 
 export default router;

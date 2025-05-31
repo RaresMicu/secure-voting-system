@@ -16,12 +16,14 @@ app.use(express.json());
 app.use("/pollingmachine", voteRouter);
 app.use("/blockchain", blockchainRouter);
 
-schedule_initialization_DB();
-schedule_result_sending();
+if (process.env.NODE_ENV !== "test") {
+  schedule_initialization_DB();
+  schedule_result_sending();
+}
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-export { prisma };
+export { prisma, app };

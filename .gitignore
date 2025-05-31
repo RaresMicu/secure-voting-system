@@ -4,8 +4,12 @@ nbis
 nbisinst
 minutiae
 backend-auth/assets/
- backend-auth/logs/
- backend-auth/uploads/
+backend-auth/logs/
+backend-auth/uploads/
+
+/backend-auth/assets/
+/backend-auth/logs/
+/backend-auth/uploads/
 # Hardhat files
 /cache
 /artifacts

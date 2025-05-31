@@ -1,6 +1,6 @@
+import "./IDCheckPage.css";
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import "./IDCheckPage.css";
 import { id_auth } from "../../services/authService.js";
 
 const IDCheckPage = () => {
@@ -17,6 +17,13 @@ const IDCheckPage = () => {
       const updatedSteps = [...(location.state?.completedSteps || [])];
 
       console.log("ID Check Response:", data);
+
+      if (data.info) {
+        alert(
+          `The citizen ${data.info.firstname}  ${data.info.lastname} has already voted in ${data.info.location} at ${data.info.timestamp}`
+        );
+        return navigate("/", { state: { activatedStep: "" } });
+      }
 
       if (data.result) {
         if (!updatedSteps.includes("ID")) {

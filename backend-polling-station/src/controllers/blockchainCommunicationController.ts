@@ -6,7 +6,6 @@ import {
   sanitizeEnvString,
   sanitizeEnvList,
 } from "../../../shared-utils/sanitize";
-import { log } from "console";
 
 export const send_results = async (req: Request, res: Response) => {
   logTask("Send Results to Blockchain", "Started", {
@@ -17,7 +16,8 @@ export const send_results = async (req: Request, res: Response) => {
     logTask("Send Results to Blockchain", "Error", {
       message: "Missing station_id in request body.",
     });
-    return res.status(400).json({ error: "Missing station_id." });
+    res.status(400).json({ error: "Missing station_id." });
+    return;
   }
 
   const response = await fetch(
@@ -34,7 +34,8 @@ export const send_results = async (req: Request, res: Response) => {
     logTask("Send Results to Blockchain", "Error", {
       message: `Failed to fetch votes data: ${response.statusText}`,
     });
-    return res.status(500).json({ error: "Failed to fetch votes data." });
+    res.status(500).json({ error: "Failed to fetch votes data." });
+    return;
   }
 
   const votesData = await response.json();
@@ -65,9 +66,8 @@ export const send_results = async (req: Request, res: Response) => {
     logTask("Send Results to Blockchain", "Error", {
       message: `Sanitization failed: ${err.message}`,
     });
-    return res
-      .status(400)
-      .json({ error: `Sanitization failed: ${err.message}` });
+    res.status(400).json({ error: `Sanitization failed: ${err.message}` });
+    return;
   }
 
   const scriptPath = path.resolve(
@@ -96,7 +96,8 @@ export const send_results = async (req: Request, res: Response) => {
         });
         console.error(`Error executing script: ${error.message}`);
         console.error(`stderr: ${stderr}`);
-        return res.status(500).json({ error: "Script execution failed." });
+        res.status(500).json({ error: "Script execution failed." });
+        return;
       }
 
       logTask("Send Results to Blockchain", "Success", {

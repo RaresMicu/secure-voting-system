@@ -1,7 +1,9 @@
 import "./FingerprintPage.css";
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { fingerprint_auth } from "../../services/authService.js";
+import {
+  fingerprint_auth,
+} from "../../services/authService.js";
 
 const FingerprintPage = () => {
   const [reference, setReference] = useState(null);

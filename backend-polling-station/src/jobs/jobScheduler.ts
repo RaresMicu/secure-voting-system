@@ -76,7 +76,7 @@ export const schedule_initialization_DB = () => {
         message: "Database initialized with candidates successfully",
         data,
       });
-      console.log("Database initialized:", data);
+      // console.log("Database initialized:", data);
     } catch (error) {
       logTask("Initialization DB", "Error", {
         message: `Failed to initialize candidates: ${

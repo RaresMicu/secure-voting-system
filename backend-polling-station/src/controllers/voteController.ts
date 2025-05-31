@@ -2,7 +2,6 @@ import crypto from "crypto";
 import { prisma } from "../app";
 import { Request, Response } from "express";
 import { logTask } from "../utilities/logger";
-import { log } from "console";
 
 //GET: Functie care returneaza toate voturile din cutia securizata pentru audit
 export const get_all_secured_votes = async (req: Request, res: Response) => {
@@ -16,11 +15,18 @@ export const get_all_secured_votes = async (req: Request, res: Response) => {
       },
     });
 
+    if (!secured_votes) {
+      logTask("Get All Secured Votes", "Error", {
+        message: "Internal server error.",
+      });
+      res.status(500).json({ error: "Internal server error" });
+      return;
+    }
     logTask("Get All Secured Votes", "Success", {
       message: "Fetched all secured votes successfully.",
       count: secured_votes.length,
     });
-    return res.status(200).json(secured_votes);
+    res.status(200).json(secured_votes);
   } catch (error) {
     logTask("Get All Secured Votes", "Error", {
       message: `Failed to fetch secured votes: ${
@@ -28,7 +34,8 @@ export const get_all_secured_votes = async (req: Request, res: Response) => {
       }`,
     });
     console.error("Error fetching secured_votes:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
+    return;
   }
 };
 
@@ -43,7 +50,8 @@ export const secure_vote = async (req: Request, res: Response) => {
     logTask("Secure Vote", "Error", {
       message: "Missing required fields in request body.",
     });
-    return res.status(400).json({ error: "Missing required fields" });
+    res.status(400).json({ error: "Missing required fields" });
+    return;
   }
 
   try {
@@ -62,12 +70,19 @@ export const secure_vote = async (req: Request, res: Response) => {
       },
     });
 
+    if (!vote) {
+      logTask("Secure Vote", "Error", {
+        message: "Failed to secure vote in the database.",
+      });
+      res.status(500).json({ error: "Failed to secure vote" });
+      return;
+    }
     logTask("Secure Vote", "Success", {
       message: "Vote secured successfully.",
       vote_id: vote.vote_id,
       candidate: vote.candidate,
     });
-    return res.status(201).json(vote);
+    res.status(201).json(vote);
   } catch (error) {
     logTask("Secure Vote", "Error", {
       message: `Failed to secure vote: ${
@@ -75,12 +90,16 @@ export const secure_vote = async (req: Request, res: Response) => {
       }`,
     });
     console.error("Error securing vote:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
+    return;
   }
 };
 
 // GET: Functie care returneaza toate voturile inregistrate
-export const get_all_votes = async (req: Request, res: Response) => {
+export const get_all_votes = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   logTask("Get All Votes", "Started");
   try {
     // Preluarea tuturor voturilor din baza de date
@@ -91,11 +110,19 @@ export const get_all_votes = async (req: Request, res: Response) => {
       },
     });
 
+    if (!votes) {
+      logTask("Get All Votes", "Error", {
+        message: "Internal server error.",
+      });
+      res.status(500).json({ error: "Internal server error" });
+      return;
+    }
+
     logTask("Get All Votes", "Success", {
       message: "Fetched all votes successfully.",
       count: votes.length,
     });
-    return res.status(200).json(votes);
+    res.status(200).json(votes);
   } catch (error) {
     logTask("Get All Votes", "Error", {
       message: `Failed to fetch votes: ${
@@ -103,7 +130,8 @@ export const get_all_votes = async (req: Request, res: Response) => {
       }`,
     });
     console.error("Error fetching votes:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
+    return;
   }
 };
 
@@ -118,7 +146,8 @@ export const cast_vote = async (req: Request, res: Response) => {
     logTask("Cast Vote", "Error", {
       message: "Missing required fields in request body.",
     });
-    return res.status(400).json({ error: "Missing required fields" });
+    res.status(400).json({ error: "Missing required fields" });
+    return;
   }
 
   try {
@@ -134,12 +163,20 @@ export const cast_vote = async (req: Request, res: Response) => {
       },
     });
 
+    if (!updated_vote) {
+      logTask("Cast Vote", "Error", {
+        message: "Failed to cast vote in the database.",
+      });
+      res.status(500).json({ error: "Failed to cast vote" });
+      return;
+    }
+
     logTask("Cast Vote", "Success", {
       message: "Vote cast successfully.",
       candidate: updated_vote.candidate,
       votes: updated_vote.votes,
     });
-    return res.status(201).json(updated_vote);
+    res.status(201).json(updated_vote);
   } catch (error) {
     logTask("Cast Vote", "Error", {
       message: `Failed to cast vote: ${
@@ -147,7 +184,8 @@ export const cast_vote = async (req: Request, res: Response) => {
       }`,
     });
     console.error("Error casting vote:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
+    return;
   }
 };
 
@@ -162,9 +200,8 @@ export const initialize_candidates = async (req: Request, res: Response) => {
     logTask("Initialize Candidates", "Error", {
       message: "Missing or invalid candidates array in request body.",
     });
-    return res
-      .status(400)
-      .json({ error: "Missing or invalid candidates array" });
+    res.status(400).json({ error: "Missing or invalid candidates array" });
+    return;
   }
 
   try {
@@ -174,11 +211,19 @@ export const initialize_candidates = async (req: Request, res: Response) => {
       })),
     });
 
+    if (!new_candidates) {
+      logTask("Initialize Candidates", "Error", {
+        message: "Failed to initialize candidates in the database.",
+      });
+      res.status(500).json({ error: "Failed to initialize candidates" });
+      return;
+    }
+
     logTask("Initialize Candidates", "Success", {
       message: "Candidates initialized successfully.",
       count: new_candidates.count,
     });
-    return res.status(201).json(new_candidates);
+    res.status(201).json(new_candidates);
   } catch (error) {
     logTask("Initialize Candidates", "Error", {
       message: `Failed to initialize candidates: ${
@@ -186,7 +231,8 @@ export const initialize_candidates = async (req: Request, res: Response) => {
       }`,
     });
     console.error("Error initializing candidates:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
+    return;
   }
 };
 
@@ -201,7 +247,7 @@ export const reset_db = async (req: Request, res: Response) => {
     logTask("Reset Database", "Success", {
       message: "Database reset successfully.",
     });
-    return res.status(200).json({ message: "Database reset successfully" });
+    res.status(200).json({ message: "Database reset successfully" });
   } catch (error) {
     logTask("Reset Database", "Error", {
       message: `Failed to reset database: ${
@@ -209,7 +255,8 @@ export const reset_db = async (req: Request, res: Response) => {
       }`,
     });
     console.error("Error resetting database:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
+    return;
   }
 };
 
@@ -226,7 +273,8 @@ export const activate_polling_station = async (req: Request, res: Response) => {
     logTask("Activate Polling Station", "Error", {
       message: "Missing required fields in request headers.",
     });
-    return res.status(400).json({ error: "Missing required fields" });
+    res.status(400).json({ error: "Missing required fields" });
+    return;
   }
 
   try {
@@ -241,14 +289,15 @@ export const activate_polling_station = async (req: Request, res: Response) => {
       logTask("Activate Polling Station", "Error", {
         message: "Unauthorized access attempt with invalid hash.",
       });
-      return res.status(401).json({ error: "Unauthorized" });
+      res.status(401).json({ error: "Unauthorized" });
+      return;
     }
 
     logTask("Activate Polling Station", "Success", {
       message: "Polling station activated successfully.",
       polling_station_hash: activated_key_hash,
     });
-    return res.status(200).json();
+    res.status(200).json();
   } catch (error) {
     logTask("Activate Polling Station", "Error", {
       message: `Failed to activate polling station: ${
@@ -256,6 +305,7 @@ export const activate_polling_station = async (req: Request, res: Response) => {
       }`,
     });
     console.error("Error activating polling station:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
+    return;
   }
 };

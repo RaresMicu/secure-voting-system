@@ -21,7 +21,6 @@ const FaceRecPage = () => {
         if (!updatedSteps.includes("Default")) {
           updatedSteps.push("Default");
         }
-        localStorage.removeItem("voterId");
         navigate("/", {
           state: { completedSteps: updatedSteps, activatedStep: "Step 4" },
         });

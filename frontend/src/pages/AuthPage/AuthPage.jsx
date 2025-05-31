@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./AuthPage.css";
 import AuthMenu from "../../components/AuthMenu/AuthMenu.jsx";
-import { auth_session } from "../../services/authService.js";
+import { auth_session, set_voter_status } from "../../services/authService.js";
 
 function AuthPage({ setIsAuthenticated }) {
   const [stepDescription, setStepDescription] = useState("ID authentication");
@@ -53,6 +53,14 @@ function AuthPage({ setIsAuthenticated }) {
 
       if (response === 200) {
         setIsAuthenticated(true);
+        const voterId = localStorage.getItem("voterId") || "";
+        if (!voterId) {
+          console.error("Voter ID not found in localStorage.");
+          return;
+        }
+        await set_voter_status(voterId);
+        localStorage.removeItem("voterId");
+
         navigate("/voting");
       } else {
         console.error("Authentication failed:", response.statusText);
